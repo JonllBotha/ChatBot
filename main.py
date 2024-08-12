@@ -12,11 +12,18 @@ logger = logging.getLogger(__name__)
 
 def scrape_medals():
     url = "https://olympics.com/en/news/olympic-games-paris-2024-south-africa-s-medal-winners-full-list"
-    response = requests.get(url)
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching medals data: {e}")
+        return {"gold": [], "silver": [], "bronze": []}
+    
     soup = BeautifulSoup(response.content, "html.parser")
     
     medals = {"gold": [], "silver": [], "bronze": []}
-
+    
     for medal_type in medals.keys():
         medal_elements = soup.find_all("div", class_=f"medal-{medal_type}")
         for element in medal_elements:
