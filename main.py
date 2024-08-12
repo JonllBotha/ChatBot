@@ -43,7 +43,8 @@ async def medals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         medals = scrape_medals()
         message = "South Africa's Olympic Medals:\n"
         for medal_type, winners in medals.items():
-            message += f"\n{medal_type.capitalize()} Medals:\n"
+            count = len(winners)  
+            message += f"\n{medal_type.capitalize()} Medals ({count}):\n"  
             for athlete, sport in winners:
                 message += f"- {athlete} in {sport}\n"
         await update.message.reply_text(message)
@@ -61,4 +62,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-    
+
