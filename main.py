@@ -23,6 +23,8 @@ def scrape_medals():
         return {"gold": [], "silver": [], "bronze": []}
     
     soup = BeautifulSoup(response.content, "html.parser")
+
+    print(soup.prettify())
     
     medals = {"gold": [], "silver": [], "bronze": []}
     
@@ -42,9 +44,9 @@ async def medals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         medals = scrape_medals()
         message = "South Africa's Olympic Medals:\n"
-        for medal_type, winners in medals.items():
-            count = len(winners)  
-            message += f"\n{medal_type.capitalize()} Medals ({count}):\n"  
+        for medal_type, winners in medals.items(): 
+            count = len(winners)
+            message += f"\n{medal_type.capitalize()} Medals: {count}\n"  
             for athlete, sport in winners:
                 message += f"- {athlete} in {sport}\n"
         await update.message.reply_text(message)
