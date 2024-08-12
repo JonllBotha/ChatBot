@@ -1,6 +1,4 @@
 import logging
-import requests
-from bs4 import BeautifulSoup
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram.error import TimedOut
@@ -12,29 +10,14 @@ nlp = spacy.load("en_core_web_sm")
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def scrape_medals():
-    url = "https://olympics.com/en/news/olympic-games-paris-2024-south-africa-s-medal-winners-full-list"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error fetching medals data: {e}")
-        return {"gold": [], "silver": [], "bronze": []}
-    
-    soup = BeautifulSoup(response.content, "html.parser")
-
-    print(soup.prettify())
-    
-    medals = {"gold": [], "silver": [], "bronze": []}
-    
-    for medal_type in medals.keys():
-        medal_elements = soup.find_all("div", class_=f"medal-{medal_type}")
-        for element in medal_elements:
-            athlete = element.find("span", class_="athlete-name").text
-            sport = element.find("span", class_="sport-name").text
-            medals[medal_type].append((athlete, sport))
-    
+def get_medal_data():
+    medals = {
+        "gold": [("Tatjana Smith", "100m Breaststroke")],
+        "silver": [("Tatjana Smith", "200m Breaststroke"), 
+                   ("Akani Simbine, Shaun Maswanganyi, Sinesipho Dambile, Bradley Nkoana and Bayanda Walaza", "Men’s 4x100m relay"), 
+                   ("Jo-Ane van Wyk", "Javelin")],
+        "bronze": [("Blitz Bokke", "7s Rugby"), ("Alan Hatherly", "Men’s Cross-Country Cycling Mountain Bike race")]
+    }
     return medals
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -42,11 +25,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def medals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
-        medals = scrape_medals()
+        medals = get_medal_data()
         message = "South Africa's Olympic Medals:\n"
-        for medal_type, winners in medals.items(): 
+        for medal_type, winners in medals.items():
             count = len(winners)
-            message += f"\n{medal_type.capitalize()} Medals: {count}\n"  
+            message += f"\n{medal_type.capitalize()} Medals: {count}\n"
             for athlete, sport in winners:
                 message += f"- {athlete} in {sport}\n"
         await update.message.reply_text(message)
