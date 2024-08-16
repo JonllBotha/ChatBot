@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -45,6 +46,5 @@ def main() -> None:
     
     application.run_polling()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
