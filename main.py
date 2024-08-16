@@ -22,7 +22,10 @@ def get_medal_data():
     return medals
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('Hi! I can tell you about South Africa\'s Olympic medals. Use /medals to get the latest info.')
+    await update.message.reply_text(
+        'Hi! I can tell you about South Africa\'s Olympic medals. '
+        'Use /medals to get the latest info. '
+    )
 
 async def medals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('Please type the type of medal you want to see (gold, silver, bronze, or all).')
