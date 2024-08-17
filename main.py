@@ -35,6 +35,7 @@ def get_medal_data():
         medal_type = medal.select_one('.medallist__medal').text.strip().lower()
         medals[medal_type].append((athlete, event))
 
+    logger.info(f"Scraped medals data: {medals}")
     return medals
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -49,6 +50,7 @@ async def medals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def medal_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         user_input = update.message.text.lower()
+        logger.info(f"User input: {user_input}")
         medals = get_medal_data()
         if user_input in medals or user_input == "all":
             message = "South Africa's Olympic Medals:\n"
@@ -69,6 +71,9 @@ async def medal_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             await update.message.reply_text('Invalid input. Please type gold, silver, bronze, or all.')
     except TimedOut:
         await handle_timeout(update)
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        await update.message.reply_text("An error occurred. Please try again later.")
 
 async def handle_timeout(update: Update) -> None:
     await update.message.reply_text("The request timed out. Please try again later.")
