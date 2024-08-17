@@ -2,6 +2,7 @@
 import logging
 import spacy
 from telegram import Update
+from telegram import Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.error import TimedOut
 import time
