@@ -2,7 +2,7 @@
 import logging
 import spacy
 import requests
-# import python-telegram-bot
+import python-telegram-bot
 from bs4 import BeautifulSoup
 from telegram import Update
 from telegram import Bot
