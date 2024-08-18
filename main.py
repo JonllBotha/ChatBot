@@ -2,7 +2,7 @@
 import logging
 import spacy
 import requests
-import python-telegram-bot
+# import python-telegram-bot
 from bs4 import BeautifulSoup
 from telegram import Update
 from telegram import Bot
@@ -14,31 +14,31 @@ nlp = spacy.load("en_core_web_sm")
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-#def get_medal_data():
-    #medals = {
-       # "gold": [("Tatjana Smith", "100m Breaststroke")],
-       # "silver": [("Tatjana Smith", "200m Breaststroke"), 
-       #            ("Akani Simbine, Shaun Maswanganyi, Sinesipho Dambile, Bradley Nkoana and Bayanda Walaza", "Men’s 4x100m relay"), 
-       #            ("Jo-Ane van Wyk", "Javelin")],
-       # "bronze": [("Blitz Bokke", "7s Rugby"), ("Alan Hatherly", "Men’s Cross-Country Cycling Mountain Bike race")]
-   # }
-   # return medals
-
 def get_medal_data():
-    url = "https://olympics.com/en/paris-2024/medals/medallists/south-africa"
-    response = requests.get(url)
-    print(response.status_code)
-    soup = BeautifulSoup(response.content, 'html.parser')
-
-    medals = {"gold": [], "silver": [], "bronze": []}
-    for medal in soup.select('.medallist'):
-        athlete = medal.select_one('.medallist__name').text.strip()
-        event = medal.select_one('.medallist__event').text.strip()
-        medal_type = medal.select_one('.medallist__medal').text.strip().lower()
-        medals[medal_type].append((athlete, event))
-
-    logger.info(f"Scraped medals data: {medals}")
+    medals = {
+        "gold": [("Tatjana Smith", "100m Breaststroke")],
+        "silver": [("Tatjana Smith", "200m Breaststroke"), 
+                   ("Akani Simbine, Shaun Maswanganyi, Sinesipho Dambile, Bradley Nkoana and Bayanda Walaza", "Men’s 4x100m relay"), 
+                   ("Jo-Ane van Wyk", "Javelin")],
+       "bronze": [("Blitz Bokke", "7s Rugby"), ("Alan Hatherly", "Men’s Cross-Country Cycling Mountain Bike race")]
+     }
     return medals
+
+#def get_medal_data():
+    #url = "https://olympics.com/en/paris-2024/medals/medallists/south-africa"
+    #response = requests.get(url)
+    #print(response.status_code)
+    #soup = BeautifulSoup(response.content, 'html.parser')
+
+    #medals = {"gold": [], "silver": [], "bronze": []}
+    #for medal in soup.select('.medallist'):
+        #athlete = medal.select_one('.medallist__name').text.strip()
+       # event = medal.select_one('.medallist__event').text.strip()
+        #medal_type = medal.select_one('.medallist__medal').text.strip().lower()
+        #medals[medal_type].append((athlete, event))
+
+    #logger.info(f"Scraped medals data: {medals}")
+    #return medals
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
