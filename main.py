@@ -2,6 +2,7 @@
 import logging
 import spacy
 import requests
+import python-telegram-bot
 from bs4 import BeautifulSoup
 from telegram import Update
 from telegram import Bot
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 def get_medal_data():
     url = "https://olympics.com/en/paris-2024/medals/medallists/south-africa"
     response = requests.get(url)
+    print(response.status_code)
     soup = BeautifulSoup(response.content, 'html.parser')
 
     medals = {"gold": [], "silver": [], "bronze": []}
@@ -52,6 +54,7 @@ async def medal_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         user_input = update.message.text.lower()
         logger.info(f"User input: {user_input}")
         medals = get_medal_data()
+        logger.info(f"Medals data: {medals}")
         if user_input in medals or user_input == "all":
             message = "South Africa's Olympic Medals:\n"
             if user_input == "all":
@@ -78,10 +81,14 @@ async def medal_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 async def handle_timeout(update: Update) -> None:
     await update.message.reply_text("The request timed out. Please try again later.")
 
+async def test_bot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text('Bot is working!')
+
 def main() -> None:
     application = Application.builder().token("7350630932:AAE5k-4YKBdTOOxrwoRWqWFuaccnVN1YXw8").read_timeout(20).write_timeout(20).build()
     
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("test", test_bot))
     application.add_handler(CommandHandler("medals", medals))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, medal_type))
     
