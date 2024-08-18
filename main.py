@@ -24,22 +24,6 @@ def get_medal_data():
      }
     return medals
 
-#def get_medal_data():
-    #url = "https://olympics.com/en/paris-2024/medals/medallists/south-africa"
-    #response = requests.get(url)
-    #print(response.status_code)
-    #soup = BeautifulSoup(response.content, 'html.parser')
-
-    #medals = {"gold": [], "silver": [], "bronze": []}
-    #for medal in soup.select('.medallist'):
-        #athlete = medal.select_one('.medallist__name').text.strip()
-       # event = medal.select_one('.medallist__event').text.strip()
-        #medal_type = medal.select_one('.medallist__medal').text.strip().lower()
-        #medals[medal_type].append((athlete, event))
-
-    #logger.info(f"Scraped medals data: {medals}")
-    #return medals
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         'Hi! I can tell you about South Africa\'s Olympic medals. '
@@ -53,20 +37,27 @@ async def medal_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     try:
         user_input = update.message.text.lower()
         logger.info(f"User input: {user_input}")
+        doc = nlp(user_input)
+        medal_type = None
+        for token in doc:
+            if token.lemma_ in ["gold", "silver", "bronze"]:
+                medal_type = token.lemma_
+                break
+        
         medals = get_medal_data()
         logger.info(f"Medals data: {medals}")
-        if user_input in medals or user_input == "all":
+        if medal_type in medals or medal_type == "all":
             message = "South Africa's Olympic Medals:\n"
-            if user_input == "all":
+            if medal_type == "all":
                 for medal_type, winners in medals.items():
                     count = len(winners)
                     message += f"\n{medal_type.capitalize()} Medals: {count}\n"
                     for athlete, sport in winners:
                         message += f"- {athlete} in {sport}\n"
             else:
-                winners = medals[user_input]
+                winners = medals[medal_type]
                 count = len(winners)
-                message += f"\n{user_input.capitalize()} Medals: {count}\n"
+                message += f"\n{medal_type.capitalize()} Medals: {count}\n"
                 for athlete, sport in winners:
                     message += f"- {athlete} in {sport}\n"
             await update.message.reply_text(message)
@@ -81,18 +72,25 @@ async def medal_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 async def handle_timeout(update: Update) -> None:
     await update.message.reply_text("The request timed out. Please try again later.")
 
-async def test_bot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('Bot is working!')
+async def extract_entities(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_input = update.message.text
+    doc = nlp(user_input)
+    entities = [(ent.text, ent.label_) for ent in doc.ents]
+    if entities:
+        response = "I found the following entities:\n"
+        response += "\n".join([f"{text} ({label})" for text, label in entities])
+    else:
+        response = "I didn't find any entities."
+    await update.message.reply_text(response)
 
 def main() -> None:
     application = Application.builder().token("7350630932:AAE5k-4YKBdTOOxrwoRWqWFuaccnVN1YXw8").read_timeout(20).write_timeout(20).build()
     
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("test", test_bot))
     application.add_handler(CommandHandler("medals", medals))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, medal_type))
     
     application.run_polling()
 
 if __name__ == "__main__":
-    main()
+    main()    
