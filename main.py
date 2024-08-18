@@ -40,7 +40,7 @@ async def medal_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         doc = nlp(user_input)
         medal_type = None
         for token in doc:
-            if token.lemma_ in ["gold", "silver", "bronze"]:
+            if token.lemma_ in ["gold", "silver", "bronze", "all"]:
                 medal_type = token.lemma_
                 break
         
